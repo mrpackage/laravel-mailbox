@@ -121,7 +121,7 @@ class Route
     protected function convertReceivedValues($receivedParts): array
     {
         return Collection::make($receivedParts)
-                         ->map(function (ReceivedPart $ReceivedPart) {
+                         ->map(function ($ReceivedPart) {
                              return str_replace('>','', str_replace('<','',$ReceivedPart->getValue()));
                          })->toArray();
     }
