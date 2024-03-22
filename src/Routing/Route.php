@@ -125,7 +125,7 @@ class Route
     {
         return Collection::make($receivedParts)
                          ->map(function (ReceivedDomainPart $receivedDomainPart) {
-                             return $receivedDomainPart->getValue();
+                             return str_replace('>','', str_replace('<','',$receivedDomainPart->getValue()));
                          })->toArray();
     }
 
