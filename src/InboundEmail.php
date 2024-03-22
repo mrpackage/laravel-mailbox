@@ -10,7 +10,11 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use ZBateson\MailMimeParser\Header\AddressHeader;
+use ZBateson\MailMimeParser\Header\GenericHeader;
 use ZBateson\MailMimeParser\Header\Part\AddressPart;
+use ZBateson\MailMimeParser\Header\Part\LiteralPart;
+use ZBateson\MailMimeParser\Header\Part\ReceivedDomainPart;
+use ZBateson\MailMimeParser\Header\ReceivedHeader;
 use ZBateson\MailMimeParser\Message as MimeMessage;
 use ZBateson\MailMimeParser\Message\Part\MessagePart;
 
@@ -107,11 +111,11 @@ class InboundEmail extends Model
     }
 
     /**
-     * @return AddressPart[]
+     * @return ReceivedDomainPart[]
      */
-    public function xForwardedTo(): array
+    public function received(): array
     {
-        return $this->convertAddressHeader($this->message()->getHeader('X-Forwarded-To'));
+        return $this->convertReceivedHeaders($this->message()->getAllHeadersByName('received'));
     }
 
     /**
@@ -137,6 +141,19 @@ class InboundEmail extends Model
         }
 
         return [];
+    }
+
+    protected function convertReceivedHeaders($headers): array
+    {
+        $parts = [];
+
+        foreach($headers as $header){
+            if ($header instanceof ReceivedHeader) {
+                $parts[] = $header->getParts();
+            }
+        }
+
+        return $parts;
     }
 
     /**

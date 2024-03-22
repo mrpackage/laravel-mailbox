@@ -11,6 +11,8 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use ReflectionFunction;
 use ZBateson\MailMimeParser\Header\Part\AddressPart;
+use ZBateson\MailMimeParser\Header\Part\LiteralPart;
+use ZBateson\MailMimeParser\Header\Part\ReceivedDomainPart;
 
 class Route
 {
@@ -20,7 +22,7 @@ class Route
 
     const FROM = 'from';
     const TO = 'to';
-    const X_FORWARDED_TO = 'x-forwarded-to';
+    const RECEIVED = 'received';
     const CC = 'cc';
     const BCC = 'bcc';
     const SUBJECT = 'subject';
@@ -88,8 +90,8 @@ class Route
             case self::TO:
                 return $this->convertMessageAddresses($message->to());
             break;
-            case self::X_FORWARDED_TO:
-                return $this->convertMessageAddresses($message->xForwardedTo());
+            case self::RECEIVED:
+                return $this->convertReceivedValues($message->received());
                 break;
             case self::CC:
                 return $this->convertMessageAddresses($message->cc());
@@ -113,6 +115,18 @@ class Route
             ->map(function (AddressPart $address) {
                 return $address->getEmail();
             })->toArray();
+    }
+
+    /**
+     * @param $receivedParts ReceivedDomainPart[]
+     * @return array
+     */
+    protected function convertReceivedValues($receivedParts): array
+    {
+        return Collection::make($receivedParts)
+                         ->map(function (ReceivedDomainPart $receivedDomainPart) {
+                             return $receivedDomainPart->getValue();
+                         })->toArray();
     }
 
     public function run(InboundEmail $email)
