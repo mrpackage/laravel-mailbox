@@ -146,7 +146,7 @@ class InboundEmail extends Model
 
         foreach($headers as $header){
             if ($header instanceof ReceivedHeader) {
-                $parts[] = $header->getParts();
+                $parts = $parts + $header->getParts();
             }
         }
 
