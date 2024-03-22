@@ -110,9 +110,6 @@ class InboundEmail extends Model
         return $this->convertAddressHeader($this->message()->getHeader('To'));
     }
 
-    /**
-     * @return ReceivedDomainPart[]
-     */
     public function received(): array
     {
         return $this->convertReceivedHeaders($this->message()->getAllHeadersByName('received'));

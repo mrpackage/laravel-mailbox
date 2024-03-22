@@ -13,6 +13,7 @@ use ReflectionFunction;
 use ZBateson\MailMimeParser\Header\Part\AddressPart;
 use ZBateson\MailMimeParser\Header\Part\LiteralPart;
 use ZBateson\MailMimeParser\Header\Part\ReceivedDomainPart;
+use ZBateson\MailMimeParser\Header\Part\ReceivedPart;
 
 class Route
 {
@@ -117,15 +118,11 @@ class Route
             })->toArray();
     }
 
-    /**
-     * @param $receivedParts ReceivedDomainPart[]
-     * @return array
-     */
     protected function convertReceivedValues($receivedParts): array
     {
         return Collection::make($receivedParts)
-                         ->map(function (ReceivedDomainPart $receivedDomainPart) {
-                             return str_replace('>','', str_replace('<','',$receivedDomainPart->getValue()));
+                         ->map(function (ReceivedPart $ReceivedPart) {
+                             return str_replace('>','', str_replace('<','',$ReceivedPart->getValue()));
                          })->toArray();
     }
 
