@@ -11,6 +11,9 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use ReflectionFunction;
 use ZBateson\MailMimeParser\Header\Part\AddressPart;
+use ZBateson\MailMimeParser\Header\Part\LiteralPart;
+use ZBateson\MailMimeParser\Header\Part\ReceivedDomainPart;
+use ZBateson\MailMimeParser\Header\Part\ReceivedPart;
 
 class Route
 {
@@ -20,6 +23,7 @@ class Route
 
     const FROM = 'from';
     const TO = 'to';
+    const RECEIVED = 'received';
     const CC = 'cc';
     const BCC = 'bcc';
     const SUBJECT = 'subject';
@@ -87,6 +91,9 @@ class Route
             case self::TO:
                 return $this->convertMessageAddresses($message->to());
             break;
+            case self::RECEIVED:
+                return $this->convertReceivedValues($message->received());
+                break;
             case self::CC:
                 return $this->convertMessageAddresses($message->cc());
             break;
@@ -109,6 +116,14 @@ class Route
             ->map(function (AddressPart $address) {
                 return $address->getEmail();
             })->toArray();
+    }
+
+    protected function convertReceivedValues($receivedParts): array
+    {
+        return Collection::make($receivedParts)
+                         ->map(function ($ReceivedPart) {
+                             return str_replace('>','', str_replace('<','',$ReceivedPart->getValue()));
+                         })->toArray();
     }
 
     public function run(InboundEmail $email)
